@@ -1,0 +1,21 @@
+meta {
+  name: Create a list
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3001/users/673b24b52b9d987e5007ab2e/lists
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzNiMjRiNTJiOWQ5ODdlNTAwN2FiMmUiLCJpYXQiOjE3MzE5Mjk1OTIsImV4cCI6MTczMTkyOTYyMn0.zI_h-QTacd4ioYneVXi6DJpwnt6zFxNPJ3MmdsJVA0A
+}
+
+body:json {
+  {
+    "name": "test"
+  }
+}

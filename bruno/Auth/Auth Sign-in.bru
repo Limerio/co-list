@@ -1,0 +1,18 @@
+meta {
+  name: Auth Sign-in
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3001/auth/sign-in
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "vincent.raoul@supdevinci-edu.fr",
+    "password": "123!@#qweQWE"
+  }
+}
