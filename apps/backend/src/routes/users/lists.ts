@@ -2,30 +2,35 @@ import { Router } from "express";
 import { z } from "zod";
 import type { Context } from "../..";
 import { validateMiddleware } from "../../middlewares/validate";
-import { paramListIdValidator } from "../../validators";
+import { idValidator } from "../../validators";
 import type { userParamId } from "../users";
+import { tasksListRouter } from "./lists/tasks";
 
 const router = Router();
 
-const createUserLists = z.object({
+const createUserListsValidator = z.object({
   body: z.object({
     name: z.string().min(3),
   }),
 });
 
-const getUserList = z.object({
+export const getUserListValidator = z.object({
   params: z.object({
-    listId: paramListIdValidator,
+    listId: idValidator,
   }),
 });
 
-const updateList = z.object({
+const updateListValidator = z.object({
   body: z.object({
     name: z.string().min(3),
   }),
 });
 
-export const listsRouter = ({ models: { ListModel } }: Context) => {
+export const listsRouter = (ctx: Context) => {
+  const {
+    models: { ListModel },
+  } = ctx;
+
   router
     .get("/", async (req, res) => {
       const { userId: owner } = req.params as z.infer<
@@ -38,22 +43,34 @@ export const listsRouter = ({ models: { ListModel } }: Context) => {
 
       res.json(list);
     })
-    .post("/", validateMiddleware(createUserLists), async (req, res) => {
-      const { userId: owner } = req.params as z.infer<
-        typeof userParamId
-      >["params"];
-      const { name } = req.body as z.infer<typeof createUserLists>["body"];
+    .post(
+      "/",
+      validateMiddleware(createUserListsValidator),
+      async (req, res) => {
+        const { userId: owner } = req.params as z.infer<
+          typeof userParamId
+        >["params"];
+        const { name } = req.body as z.infer<
+          typeof createUserListsValidator
+        >["body"];
 
-      const list = await ListModel.create({
-        name,
-        owner,
-      });
+        const list = await ListModel.create({
+          name,
+          owner,
+        });
 
-      res.json(list);
-    })
-    .get("/:listId", validateMiddleware(getUserList), async (req, res) => {
+        res.json(list);
+      }
+    )
+    .use(
+      "/:listId/tasks",
+      validateMiddleware(getUserListValidator),
+      tasksListRouter(ctx)
+    )
+    .route("/:listId")
+    .get(validateMiddleware(getUserListValidator), async (req, res) => {
       const { userId: owner, listId: _id } = req.params as z.infer<
-        typeof getUserList & typeof userParamId
+        typeof getUserListValidator & typeof userParamId
       >["params"];
 
       const list = await ListModel.findOne({
@@ -64,13 +81,14 @@ export const listsRouter = ({ models: { ListModel } }: Context) => {
       res.json(list);
     })
     .put(
-      "/",
-      validateMiddleware(getUserList.merge(updateList)),
+      validateMiddleware(getUserListValidator.merge(updateListValidator)),
       async (req, res) => {
         const { listId: _id, userId: owner } = req.params as z.infer<
-          typeof getUserList & typeof userParamId
+          typeof getUserListValidator & typeof userParamId
         >["params"];
-        const { name } = req.body as z.infer<typeof updateList>["body"];
+        const { name } = req.body as z.infer<
+          typeof updateListValidator
+        >["body"];
 
         const list = await ListModel.findOneAndUpdate(
           {
@@ -88,9 +106,9 @@ export const listsRouter = ({ models: { ListModel } }: Context) => {
         res.json(list);
       }
     )
-    .delete("/", validateMiddleware(getUserList), async (req, res) => {
+    .delete(validateMiddleware(getUserListValidator), async (req, res) => {
       const { userId: owner, listId: _id } = req.params as z.infer<
-        typeof userParamId & typeof getUserList
+        typeof userParamId & typeof getUserListValidator
       >["params"];
 
       const list = await ListModel.findOneAndDelete({

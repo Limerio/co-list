@@ -2,14 +2,14 @@ import { Router } from "express";
 import { z } from "zod";
 import type { Context } from "..";
 import { validateMiddleware } from "../middlewares/validate";
-import { paramUserIdValidator } from "../validators";
+import { idValidator } from "../validators";
 import { listsRouter } from "./users/lists";
 
 const router = Router();
 
 export const userParamId = z.object({
   params: z.object({
-    userId: paramUserIdValidator,
+    userId: idValidator,
   }),
 });
 

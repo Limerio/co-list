@@ -26,10 +26,8 @@ const signInSchema = z.object({
 });
 
 export const authRouter = ({ models: { UserModel } }: Context) => {
-  router.post(
-    "/sign-up",
-    validateMiddleware(signUpSchema),
-    async (req, res) => {
+  router
+    .post("/sign-up", validateMiddleware(signUpSchema), async (req, res) => {
       const {
         firstName,
         lastName,
@@ -50,12 +48,8 @@ export const authRouter = ({ models: { UserModel } }: Context) => {
       await newUser.save();
 
       res.sendStatus(201);
-    }
-  );
-  router.post(
-    "/sign-in",
-    validateMiddleware(signInSchema),
-    async (req, res) => {
+    })
+    .post("/sign-in", validateMiddleware(signInSchema), async (req, res) => {
       const { email, password }: z.infer<typeof signInSchema>["body"] =
         req.body;
 
@@ -78,7 +72,7 @@ export const authRouter = ({ models: { UserModel } }: Context) => {
       const accessToken = jwt.sign(
         { _id: user.id },
         backendConfig.auth.jwt.secret,
-        { expiresIn: "30s" }
+        { expiresIn: "1d" }
       );
       const refreshToken = jwt.sign(
         { _id: user.id },
@@ -93,38 +87,36 @@ export const authRouter = ({ models: { UserModel } }: Context) => {
         maxAge: 24 * 60 * 60 * 1000,
       });
       res.status(201).json({ accessToken, id: user.id });
-    }
-  );
-
-  router.get("/refresh", async (req, res) => {
-    const cookies = req.cookies;
-    if (!cookies?.jwt) {
-      res.sendStatus(401);
-      return;
-    }
-    const refreshToken = cookies.jwt;
-
-    const user = await UserModel.findOne({
-      refreshToken,
-    });
-    if (!user) {
-      res.sendStatus(403);
-      return;
-    }
-    jwt.verify(
-      refreshToken,
-      backendConfig.auth.jwt.secret,
-      (err: Error, decoded: { id: Schema.Types.ObjectId }) => {
-        if (err || user.id !== decoded.id) return res.sendStatus(403);
-        const accessToken = jwt.sign(
-          { id: decoded.id },
-          backendConfig.auth.jwt.secret,
-          { expiresIn: "30s" }
-        );
-        res.json({ accessToken });
+    })
+    .get("/refresh", async (req, res) => {
+      const cookies = req.cookies;
+      if (!cookies?.jwt) {
+        res.sendStatus(401);
+        return;
       }
-    );
-  });
+      const refreshToken = cookies.jwt;
+
+      const user = await UserModel.findOne({
+        refreshToken,
+      });
+      if (!user) {
+        res.sendStatus(403);
+        return;
+      }
+      jwt.verify(
+        refreshToken,
+        backendConfig.auth.jwt.secret,
+        (err: Error, decoded: { id: Schema.Types.ObjectId }) => {
+          if (err || user.id !== decoded.id) return res.sendStatus(403);
+          const accessToken = jwt.sign(
+            { id: decoded.id },
+            backendConfig.auth.jwt.secret,
+            { expiresIn: "30s" }
+          );
+          res.json({ accessToken });
+        }
+      );
+    });
 
   return router;
 };

@@ -1,17 +1,14 @@
 {
   "name": "frontend",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@tanstack/router-devtools": "^1.82.1",
-    "@tanstack/router-plugin": "^1.81.9",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
@@ -24,29 +21,22 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.460.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "next": "15.0.3",
+    "react": "19.0.0-rc-66855b96-20241106",
+    "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "7.51.5",
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@eslint/js": "^9.13.0",
-    "@types/node": "^22.9.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react-swc": "^3.5.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.13.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.14",
-    "globals": "^15.11.0",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.15",
-    "typescript": "~5.6.2",
-    "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10",
-    "vite-tsconfig-paths": "^5.1.2"
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "15.0.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }
